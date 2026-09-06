@@ -6,29 +6,83 @@ import { useAuth } from './AuthContext'
 const CartContext = createContext()
 
 export const CartProvider = ({ children }) => {
-  const { isLoggedIn } = useAuth()
 
-  const [cart, setCart] = useState(() => {
+  const { user, isLoggedIn } = useAuth()
+
+  // ============================================
+  // USER-SPECIFIC CART KEY
+  // ============================================
+
+  const cartKey = user?._id
+    ? `cart_${user._id}`
+    : null
+
+
+  // ============================================
+  // CART STATE
+  // ============================================
+
+  const [cart, setCart] = useState([])
+
+
+  // ============================================
+  // LOAD USER CART
+  // ============================================
+
+  useEffect(() => {
+
+    // User logged out
+    if (!isLoggedIn || !cartKey) {
+      setCart([])
+      return
+    }
+
     try {
-      const saved = localStorage.getItem('cart')
 
-      if (!saved) return []
+      const saved = localStorage.getItem(cartKey)
+
+      if (!saved) {
+        setCart([])
+        return
+      }
 
       const parsedCart = JSON.parse(saved)
 
-      if (!Array.isArray(parsedCart)) return []
+      if (!Array.isArray(parsedCart)) {
+        setCart([])
+        return
+      }
 
-      return parsedCart
+      setCart(parsedCart)
+
     } catch (error) {
-      console.error('Cart loading error:', error)
-      return []
-    }
-  })
 
-  // Save cart to localStorage
+      console.error('Cart loading error:', error)
+
+      setCart([])
+
+    }
+
+  }, [isLoggedIn, cartKey])
+
+
+  // ============================================
+  // SAVE USER CART
+  // ============================================
+
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cart))
-  }, [cart])
+
+    if (!isLoggedIn || !cartKey) {
+      return
+    }
+
+    localStorage.setItem(
+      cartKey,
+      JSON.stringify(cart)
+    )
+
+  }, [cart, isLoggedIn, cartKey])
+
 
   // ============================================
   // ADD ITEM TO CART
@@ -37,9 +91,12 @@ export const CartProvider = ({ children }) => {
 
   const addItem = (item) => {
 
-    // User must be logged in
     if (!isLoggedIn) {
-      toast.error('Please login to add items to cart')
+
+      toast.error(
+        'Please login to add items to cart'
+      )
+
       return false
     }
 
@@ -49,6 +106,7 @@ export const CartProvider = ({ children }) => {
         (p) => p.id === item.id
       )
 
+
       // ========================================
       // ITEM ALREADY IN CART
       // ========================================
@@ -56,15 +114,22 @@ export const CartProvider = ({ children }) => {
       if (alreadyInCart) {
 
         // Check stock limit
+
         if (
           item.stock !== undefined &&
           alreadyInCart.quantity >= Number(item.stock)
         ) {
-          toast.error('Maximum available stock reached')
+
+          toast.error(
+            'Maximum available stock reached'
+          )
+
           return prev
         }
 
-        toast.success('Cart quantity increased')
+        toast.success(
+          'Cart quantity increased'
+        )
 
         return prev.map((p) =>
           p.id === item.id
@@ -76,12 +141,15 @@ export const CartProvider = ({ children }) => {
         )
       }
 
+
       // ========================================
       // PRICE CALCULATION
       // ========================================
 
       const originalPrice = Number(
-        item.originalPrice ?? item.price ?? 0
+        item.originalPrice ??
+        item.price ??
+        0
       )
 
       const discountPrice =
@@ -95,14 +163,18 @@ export const CartProvider = ({ children }) => {
       const sellingPrice =
         discountPrice ?? originalPrice
 
+
       // ========================================
       // ADD NEW ITEM
       // ========================================
 
-      toast.success('Added to cart')
+      toast.success(
+        'Added to cart'
+      )
 
       return [
         ...prev,
+
         {
           ...item,
           id: item.id,
@@ -112,16 +184,22 @@ export const CartProvider = ({ children }) => {
           quantity: 1,
         },
       ]
+
     })
 
     return true
   }
+
 
   // ============================================
   // INCREMENT
   // ============================================
 
   const increment = (id) => {
+
+    if (!isLoggedIn) {
+      return
+    }
 
     setCart((prev) =>
       prev.map((item) => {
@@ -131,11 +209,16 @@ export const CartProvider = ({ children }) => {
         }
 
         // Check stock
+
         if (
           item.stock !== undefined &&
           item.quantity >= Number(item.stock)
         ) {
-          toast.error('Maximum available stock reached')
+
+          toast.error(
+            'Maximum available stock reached'
+          )
+
           return item
         }
 
@@ -143,15 +226,21 @@ export const CartProvider = ({ children }) => {
           ...item,
           quantity: item.quantity + 1,
         }
+
       })
     )
   }
+
 
   // ============================================
   // DECREMENT
   // ============================================
 
   const decrement = (id) => {
+
+    if (!isLoggedIn) {
+      return
+    }
 
     setCart((prev) =>
       prev
@@ -163,9 +252,12 @@ export const CartProvider = ({ children }) => {
               }
             : item
         )
-        .filter((item) => item.quantity > 0)
+        .filter(
+          (item) => item.quantity > 0
+        )
     )
   }
+
 
   // ============================================
   // REMOVE ITEM
@@ -173,10 +265,17 @@ export const CartProvider = ({ children }) => {
 
   const removeItem = (id) => {
 
+    if (!isLoggedIn) {
+      return
+    }
+
     setCart((prev) =>
-      prev.filter((item) => item.id !== id)
+      prev.filter(
+        (item) => item.id !== id
+      )
     )
   }
+
 
   // ============================================
   // CLEAR CART
@@ -185,6 +284,7 @@ export const CartProvider = ({ children }) => {
   const clearCart = () => {
     setCart([])
   }
+
 
   // ============================================
   // PARSE PRICE
@@ -206,6 +306,7 @@ export const CartProvider = ({ children }) => {
     return parseFloat(cleaned) || 0
   }
 
+
   // ============================================
   // TOTAL ITEMS
   // ============================================
@@ -215,6 +316,7 @@ export const CartProvider = ({ children }) => {
       sum + Number(item.quantity || 0),
     0
   )
+
 
   // ============================================
   // TOTAL PRICE
@@ -228,6 +330,7 @@ export const CartProvider = ({ children }) => {
     0
   )
 
+
   // ============================================
   // TOTAL ORIGINAL PRICE
   // ============================================
@@ -236,7 +339,8 @@ export const CartProvider = ({ children }) => {
     (sum, item) => {
 
       const originalPrice = parsePrice(
-        item.originalPrice ?? item.price
+        item.originalPrice ??
+        item.price
       )
 
       return (
@@ -244,9 +348,11 @@ export const CartProvider = ({ children }) => {
         originalPrice *
           Number(item.quantity || 0)
       )
+
     },
     0
   )
+
 
   // ============================================
   // TOTAL DISCOUNT
@@ -256,6 +362,11 @@ export const CartProvider = ({ children }) => {
     0,
     totalOriginalPrice - totalPrice
   )
+
+
+  // ============================================
+  // PROVIDER
+  // ============================================
 
   return (
     <CartContext.Provider
@@ -277,5 +388,7 @@ export const CartProvider = ({ children }) => {
   )
 }
 
+
 export const useCart = () =>
   useContext(CartContext)
+

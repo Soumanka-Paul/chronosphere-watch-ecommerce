@@ -18,15 +18,18 @@ export default function Navbar() {
 
   const navigate = useNavigate()
 
-  // Cart
-  const {
-    totalItems,
-    clearCart,
-  } = useCart()
+  // ============================================
+  // CART
+  // ============================================
 
-  // Auth
+  const { totalItems } = useCart()
+
+
+  // ============================================
+  // AUTH
+  // ============================================
+
   const {
-    user,
     isLoggedIn,
     logout,
     isAdmin,
@@ -41,60 +44,31 @@ export default function Navbar() {
 
     try {
 
-      // ----------------------------------------
-      // 1. Clear cart from React state
-      // ----------------------------------------
+      /*
+        IMPORTANT:
 
-      clearCart()
+        Do NOT call clearCart() here.
 
+        Do NOT remove cart_${user._id}.
 
-      // ----------------------------------------
-      // 2. Remove old generic cart
-      // ----------------------------------------
-      // This prevents old users' cart from
-      // appearing for another user.
+        CartContext will automatically clear the
+        React cart state when AuthContext changes
+        user -> null.
 
-      localStorage.removeItem('cart')
+        The user's saved cart will remain in:
 
-
-      // ----------------------------------------
-      // 3. Remove current user's cart key
-      // ----------------------------------------
-      // If your CartContext uses:
-      // cart_USER_ID
-
-      if (user?._id) {
-        localStorage.removeItem(
-          `cart_${user._id}`
-        )
-      }
-
-
-      // ----------------------------------------
-      // 4. Logout from backend + AuthContext
-      // ----------------------------------------
+        cart_USER_ID
+      */
 
       await logout()
 
-
-      // ----------------------------------------
-      // 5. Remove JWT token
-      // ----------------------------------------
-
+      // Make sure JWT is removed
       localStorage.removeItem('token')
 
-
-      // ----------------------------------------
-      // 6. Close mobile menu
-      // ----------------------------------------
-
+      // Close mobile menu
       setMenuOpen(false)
 
-
-      // ----------------------------------------
-      // 7. Go to Home
-      // ----------------------------------------
-
+      // Go to home
       navigate('/')
 
     } catch (error) {
@@ -112,6 +86,7 @@ export default function Navbar() {
     <header className="fixed top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
 
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 h-[76px] flex items-center justify-between">
+
 
         {/* ======================================
             LOGO
@@ -155,7 +130,8 @@ export default function Navbar() {
 
         <nav className="hidden md:flex items-center gap-1">
 
-          {/* Home */}
+
+          {/* HOME */}
 
           <NavLink
             to="/"
@@ -171,6 +147,7 @@ export default function Navbar() {
 
             {({ isActive }) => (
               <>
+
                 Home
 
                 <span
@@ -187,7 +164,7 @@ export default function Navbar() {
           </NavLink>
 
 
-          {/* Shop */}
+          {/* SHOP */}
 
           <NavLink
             to="/shop"
@@ -202,6 +179,7 @@ export default function Navbar() {
 
             {({ isActive }) => (
               <>
+
                 Shop
 
                 <span
@@ -218,7 +196,7 @@ export default function Navbar() {
           </NavLink>
 
 
-          {/* Wishlist */}
+          {/* WISHLIST */}
 
           <NavLink
             to="/wishlist"
@@ -233,6 +211,7 @@ export default function Navbar() {
 
             {({ isActive }) => (
               <>
+
                 Wishlist
 
                 <span
@@ -249,7 +228,7 @@ export default function Navbar() {
           </NavLink>
 
 
-          {/* Orders */}
+          {/* ORDERS */}
 
           <NavLink
             to="/orders"
@@ -264,6 +243,7 @@ export default function Navbar() {
 
             {({ isActive }) => (
               <>
+
                 Orders
 
                 <span
@@ -280,7 +260,7 @@ export default function Navbar() {
           </NavLink>
 
 
-          {/* Admin */}
+          {/* ADMIN */}
 
           {isAdmin && (
 
@@ -294,7 +274,9 @@ export default function Navbar() {
                 }`
               }
             >
+
               Admin
+
             </NavLink>
 
           )}
@@ -429,7 +411,7 @@ export default function Navbar() {
           <div className="flex flex-col gap-1">
 
 
-            {/* Home */}
+            {/* HOME */}
 
             <NavLink
               to="/"
@@ -445,11 +427,13 @@ export default function Navbar() {
                 }`
               }
             >
+
               Home
+
             </NavLink>
 
 
-            {/* Shop */}
+            {/* SHOP */}
 
             <NavLink
               to="/shop"
@@ -464,11 +448,13 @@ export default function Navbar() {
                 }`
               }
             >
+
               Shop
+
             </NavLink>
 
 
-            {/* Wishlist */}
+            {/* WISHLIST */}
 
             <NavLink
               to="/wishlist"
@@ -491,7 +477,7 @@ export default function Navbar() {
             </NavLink>
 
 
-            {/* Orders */}
+            {/* ORDERS */}
 
             <NavLink
               to="/orders"
@@ -506,11 +492,13 @@ export default function Navbar() {
                 }`
               }
             >
+
               Orders
+
             </NavLink>
 
 
-            {/* Admin */}
+            {/* ADMIN */}
 
             {isAdmin && (
 
@@ -527,7 +515,9 @@ export default function Navbar() {
                   }`
                 }
               >
+
                 Admin Dashboard
+
               </NavLink>
 
             )}

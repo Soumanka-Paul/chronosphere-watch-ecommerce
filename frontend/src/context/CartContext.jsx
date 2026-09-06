@@ -1,5 +1,11 @@
 
-import { createContext, useContext, useState, useEffect } from 'react'
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+} from 'react'
+
 import toast from 'react-hot-toast'
 import { useAuth } from './AuthContext'
 
@@ -26,41 +32,79 @@ export const CartProvider = ({ children }) => {
 
 
   // ============================================
+  // CART LOADED STATE
+  // Prevent initial [] from overwriting
+  // existing user cart
+  // ============================================
+
+  const [cartLoaded, setCartLoaded] = useState(false)
+
+
+  // ============================================
   // LOAD USER CART
   // ============================================
 
   useEffect(() => {
 
-    // User logged out
+    // User is logged out
     if (!isLoggedIn || !cartKey) {
+
       setCart([])
+      setCartLoaded(false)
+
       return
     }
 
+
+    // New user / new cart
+    setCartLoaded(false)
+
+
     try {
 
-      const saved = localStorage.getItem(cartKey)
+      const savedCart = localStorage.getItem(cartKey)
 
-      if (!saved) {
+
+      // No saved cart for this user
+      if (!savedCart) {
+
         setCart([])
+
+        setCartLoaded(true)
+
         return
       }
 
-      const parsedCart = JSON.parse(saved)
 
+      const parsedCart = JSON.parse(savedCart)
+
+
+      // Make sure saved data is an array
       if (!Array.isArray(parsedCart)) {
+
         setCart([])
+
+        setCartLoaded(true)
+
         return
       }
 
+
+      // Load existing user cart
       setCart(parsedCart)
+
+      setCartLoaded(true)
 
     } catch (error) {
 
-      console.error('Cart loading error:', error)
+      console.error(
+        'Cart loading error:',
+        error
+      )
 
       setCart([])
 
+      setCartLoaded(true)
     }
 
   }, [isLoggedIn, cartKey])
@@ -72,21 +116,38 @@ export const CartProvider = ({ children }) => {
 
   useEffect(() => {
 
-    if (!isLoggedIn || !cartKey) {
+    /*
+      Do not save the cart until the existing
+      cart has been loaded.
+
+      Otherwise the initial [] could overwrite
+      the user's previous cart.
+    */
+
+    if (
+      !isLoggedIn ||
+      !cartKey ||
+      !cartLoaded
+    ) {
       return
     }
+
 
     localStorage.setItem(
       cartKey,
       JSON.stringify(cart)
     )
 
-  }, [cart, isLoggedIn, cartKey])
+  }, [
+    cart,
+    isLoggedIn,
+    cartKey,
+    cartLoaded,
+  ])
 
 
   // ============================================
   // ADD ITEM TO CART
-  // LOGIN REQUIRED
   // ============================================
 
   const addItem = (item) => {
@@ -100,6 +161,7 @@ export const CartProvider = ({ children }) => {
       return false
     }
 
+
     setCart((prev) => {
 
       const alreadyInCart = prev.find(
@@ -108,7 +170,7 @@ export const CartProvider = ({ children }) => {
 
 
       // ========================================
-      // ITEM ALREADY IN CART
+      // ITEM ALREADY EXISTS
       // ========================================
 
       if (alreadyInCart) {
@@ -127,9 +189,11 @@ export const CartProvider = ({ children }) => {
           return prev
         }
 
+
         toast.success(
           'Cart quantity increased'
         )
+
 
         return prev.map((p) =>
           p.id === item.id
@@ -152,6 +216,7 @@ export const CartProvider = ({ children }) => {
         0
       )
 
+
       const discountPrice =
         item.discountPrice !== null &&
         item.discountPrice !== undefined &&
@@ -159,6 +224,7 @@ export const CartProvider = ({ children }) => {
         Number(item.discountPrice) < originalPrice
           ? Number(item.discountPrice)
           : null
+
 
       const sellingPrice =
         discountPrice ?? originalPrice
@@ -171,6 +237,7 @@ export const CartProvider = ({ children }) => {
       toast.success(
         'Added to cart'
       )
+
 
       return [
         ...prev,
@@ -187,6 +254,7 @@ export const CartProvider = ({ children }) => {
 
     })
 
+
     return true
   }
 
@@ -201,12 +269,14 @@ export const CartProvider = ({ children }) => {
       return
     }
 
+
     setCart((prev) =>
       prev.map((item) => {
 
         if (item.id !== id) {
           return item
         }
+
 
         // Check stock
 
@@ -221,6 +291,7 @@ export const CartProvider = ({ children }) => {
 
           return item
         }
+
 
         return {
           ...item,
@@ -241,6 +312,7 @@ export const CartProvider = ({ children }) => {
     if (!isLoggedIn) {
       return
     }
+
 
     setCart((prev) =>
       prev
@@ -269,6 +341,7 @@ export const CartProvider = ({ children }) => {
       return
     }
 
+
     setCart((prev) =>
       prev.filter(
         (item) => item.id !== id
@@ -282,7 +355,9 @@ export const CartProvider = ({ children }) => {
   // ============================================
 
   const clearCart = () => {
+
     setCart([])
+
   }
 
 
@@ -296,12 +371,15 @@ export const CartProvider = ({ children }) => {
       return price
     }
 
+
     if (!price) {
       return 0
     }
 
+
     const cleaned = String(price)
       .replace(/[^0-9.]/g, '')
+
 
     return parseFloat(cleaned) || 0
   }
@@ -342,6 +420,7 @@ export const CartProvider = ({ children }) => {
         item.originalPrice ??
         item.price
       )
+
 
       return (
         sum +

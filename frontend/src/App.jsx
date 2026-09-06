@@ -24,9 +24,11 @@ import ManageWatches from './pages/admin/ManageWatches'
 import ManageOrders from './pages/admin/ManageOrders'
 import ManageUsers from './pages/admin/ManageUsers'
 
+
 function CustomerLayout() {
   return (
     <div className="flex flex-col min-h-screen overflow-x-hidden w-full">
+
       <Navbar />
 
       <main className="flex-grow pt-16 w-full">
@@ -34,22 +36,28 @@ function CustomerLayout() {
       </main>
 
       <Footer />
+
     </div>
   )
 }
+
 
 function App() {
   return (
     <Routes>
 
       {/* ================= CUSTOMER ROUTES ================= */}
+
       <Route element={<CustomerLayout />}>
+
+        {/* ================= PUBLIC ROUTES ================= */}
 
         {/* Home - Public */}
         <Route
           path="/"
           element={<Home />}
         />
+
 
         {/* ================= LOGIN REQUIRED ROUTES ================= */}
 
@@ -67,31 +75,35 @@ function App() {
             element={<WatchDetail />}
           />
 
+          {/* Cart - Login Required */}
+          <Route
+            path="/cart"
+            element={<Cart />}
+          />
+
+          {/* Checkout - Login Required */}
+          <Route
+            path="/checkout"
+            element={<Checkout />}
+          />
+
+          {/* Orders - Login Required */}
+          <Route
+            path="/orders"
+            element={<Orders />}
+          />
+
+          {/* Wishlist - Login Required */}
+          <Route
+            path="/wishlist"
+            element={<Wishlist />}
+          />
+
         </Route>
 
-        {/* ================= OTHER CUSTOMER ROUTES ================= */}
 
-        <Route
-          path="/cart"
-          element={<Cart />}
-        />
+        {/* ================= AUTHENTICATION PAGES ================= */}
 
-        <Route
-          path="/checkout"
-          element={<Checkout />}
-        />
-
-        <Route
-          path="/orders"
-          element={<Orders />}
-        />
-
-        <Route
-          path="/wishlist"
-          element={<Wishlist />}
-        />
-
-        {/* Authentication Pages */}
         <Route
           path="/login"
           element={<Login />}
@@ -109,12 +121,14 @@ function App() {
 
       </Route>
 
+
       {/* ================= RESET PASSWORD ================= */}
 
       <Route
         path="/reset-password/:token"
         element={<ResetPassword />}
       />
+
 
       {/* ================= ADMIN ROUTES ================= */}
 
@@ -152,6 +166,7 @@ function App() {
     </Routes>
   )
 }
+
 
 export default App
 

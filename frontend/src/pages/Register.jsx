@@ -1,3 +1,4 @@
+
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
@@ -53,6 +54,10 @@ export default function Register() {
         password,
       })
 
+      // Save JWT token after successful registration
+      localStorage.setItem('token', res.data.token)
+
+      // Update AuthContext
       login(res.data.user)
 
       toast.success(

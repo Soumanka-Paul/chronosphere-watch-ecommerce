@@ -15,6 +15,7 @@ export const CartProvider = ({ children }) => {
 
   const { user, isLoggedIn } = useAuth()
 
+
   // ============================================
   // USER-SPECIFIC CART KEY
   // ============================================
@@ -32,12 +33,10 @@ export const CartProvider = ({ children }) => {
 
 
   // ============================================
-  // CART LOADED STATE
-  // Prevent initial [] from overwriting
-  // existing user cart
+  // TRACK WHICH USER'S CART IS LOADED
   // ============================================
 
-  const [cartLoaded, setCartLoaded] = useState(false)
+  const [loadedCartKey, setLoadedCartKey] = useState(null)
 
 
   // ============================================
@@ -46,54 +45,79 @@ export const CartProvider = ({ children }) => {
 
   useEffect(() => {
 
-    // User is logged out
+    // ------------------------------------------
+    // USER LOGGED OUT
+    // ------------------------------------------
+
     if (!isLoggedIn || !cartKey) {
 
       setCart([])
-      setCartLoaded(false)
+
+      setLoadedCartKey(null)
 
       return
     }
 
 
-    // New user / new cart
-    setCartLoaded(false)
+    // ------------------------------------------
+    // VERY IMPORTANT
+    //
+    // New user's cart is NOT loaded yet.
+    // Therefore saving must be blocked.
+    // ------------------------------------------
+
+    setLoadedCartKey(null)
 
 
     try {
 
-      const savedCart = localStorage.getItem(cartKey)
+      const savedCart =
+        localStorage.getItem(cartKey)
 
 
-      // No saved cart for this user
+      // ----------------------------------------
+      // NO SAVED CART
+      // ----------------------------------------
+
       if (!savedCart) {
 
         setCart([])
 
-        setCartLoaded(true)
+        setLoadedCartKey(cartKey)
 
         return
       }
 
 
-      const parsedCart = JSON.parse(savedCart)
+      // ----------------------------------------
+      // PARSE CART
+      // ----------------------------------------
+
+      const parsedCart =
+        JSON.parse(savedCart)
 
 
-      // Make sure saved data is an array
+      // ----------------------------------------
+      // INVALID CART
+      // ----------------------------------------
+
       if (!Array.isArray(parsedCart)) {
 
         setCart([])
 
-        setCartLoaded(true)
+        setLoadedCartKey(cartKey)
 
         return
       }
 
 
-      // Load existing user cart
+      // ----------------------------------------
+      // LOAD USER'S CART
+      // ----------------------------------------
+
       setCart(parsedCart)
 
-      setCartLoaded(true)
+      setLoadedCartKey(cartKey)
 
     } catch (error) {
 
@@ -104,7 +128,7 @@ export const CartProvider = ({ children }) => {
 
       setCart([])
 
-      setCartLoaded(true)
+      setLoadedCartKey(cartKey)
     }
 
   }, [isLoggedIn, cartKey])
@@ -117,17 +141,24 @@ export const CartProvider = ({ children }) => {
   useEffect(() => {
 
     /*
-      Do not save the cart until the existing
-      cart has been loaded.
+      IMPORTANT:
 
-      Otherwise the initial [] could overwrite
-      the user's previous cart.
+      Only save when the cart currently belongs
+      to the SAME user whose cart was loaded.
+
+      This prevents:
+
+      User A cart
+          ↓
+      User B login
+          ↓
+      User A cart accidentally saved to B
     */
 
     if (
       !isLoggedIn ||
       !cartKey ||
-      !cartLoaded
+      loadedCartKey !== cartKey
     ) {
       return
     }
@@ -140,9 +171,9 @@ export const CartProvider = ({ children }) => {
 
   }, [
     cart,
-    isLoggedIn,
     cartKey,
-    cartLoaded,
+    isLoggedIn,
+    loadedCartKey,
   ])
 
 
@@ -175,7 +206,7 @@ export const CartProvider = ({ children }) => {
 
       if (alreadyInCart) {
 
-        // Check stock limit
+        // Check stock
 
         if (
           item.stock !== undefined &&

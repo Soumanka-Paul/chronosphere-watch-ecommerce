@@ -1,3 +1,4 @@
+
 import { useState } from 'react'
 import { NavLink, Link, useNavigate } from 'react-router-dom'
 import {
@@ -17,34 +18,124 @@ export default function Navbar() {
 
   const navigate = useNavigate()
 
-  const { totalItems } = useCart()
-  const { isLoggedIn, logout, isAdmin } = useAuth()
+  // Cart
+  const {
+    totalItems,
+    clearCart,
+  } = useCart()
+
+  // Auth
+  const {
+    user,
+    isLoggedIn,
+    logout,
+    isAdmin,
+  } = useAuth()
+
+
+  // ============================================
+  // LOGOUT
+  // ============================================
 
   const handleLogout = async () => {
-    await logout()
 
-    localStorage.removeItem('token')
+    try {
 
-    setMenuOpen(false)
+      // ----------------------------------------
+      // 1. Clear cart from React state
+      // ----------------------------------------
 
-    navigate('/')
+      clearCart()
+
+
+      // ----------------------------------------
+      // 2. Remove old generic cart
+      // ----------------------------------------
+      // This prevents old users' cart from
+      // appearing for another user.
+
+      localStorage.removeItem('cart')
+
+
+      // ----------------------------------------
+      // 3. Remove current user's cart key
+      // ----------------------------------------
+      // If your CartContext uses:
+      // cart_USER_ID
+
+      if (user?._id) {
+        localStorage.removeItem(
+          `cart_${user._id}`
+        )
+      }
+
+
+      // ----------------------------------------
+      // 4. Logout from backend + AuthContext
+      // ----------------------------------------
+
+      await logout()
+
+
+      // ----------------------------------------
+      // 5. Remove JWT token
+      // ----------------------------------------
+
+      localStorage.removeItem('token')
+
+
+      // ----------------------------------------
+      // 6. Close mobile menu
+      // ----------------------------------------
+
+      setMenuOpen(false)
+
+
+      // ----------------------------------------
+      // 7. Go to Home
+      // ----------------------------------------
+
+      navigate('/')
+
+    } catch (error) {
+
+      console.error(
+        'Logout failed:',
+        error
+      )
+
+    }
   }
+
 
   return (
     <header className="fixed top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
+
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 h-[76px] flex items-center justify-between">
+
+        {/* ======================================
+            LOGO
+        ====================================== */}
+
         <Link
           to="/"
           className="flex items-center gap-3 group"
         >
+
           <div className="relative flex items-center justify-center w-10 h-10 rounded-full bg-black transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg">
+
             <Clock className="h-5 w-5 text-white" />
+
           </div>
 
+
           <div className="flex flex-col leading-none">
+
             <span
               className="text-[21px] sm:text-2xl font-semibold tracking-tight text-gray-950"
-              style={{ fontFamily: "'Playfair Display', serif" }}
+              style={{
+                fontFamily: "'Playfair Display', serif",
+              }}
             >
               ChronoSphere
             </span>
@@ -52,10 +143,20 @@ export default function Navbar() {
             <span className="hidden sm:block text-[8px] tracking-[0.32em] uppercase text-gray-400 mt-1">
               Timeless Elegance
             </span>
+
           </div>
+
         </Link>
 
+
+        {/* ======================================
+            DESKTOP NAVIGATION
+        ====================================== */}
+
         <nav className="hidden md:flex items-center gap-1">
+
+          {/* Home */}
+
           <NavLink
             to="/"
             end
@@ -67,9 +168,11 @@ export default function Navbar() {
               }`
             }
           >
+
             {({ isActive }) => (
               <>
                 Home
+
                 <span
                   className={`absolute bottom-0 left-4 right-4 h-[1.5px] bg-black transition-transform duration-300 origin-center ${
                     isActive
@@ -77,9 +180,14 @@ export default function Navbar() {
                       : 'scale-x-0 group-hover:scale-x-100'
                   }`}
                 />
+
               </>
             )}
+
           </NavLink>
+
+
+          {/* Shop */}
 
           <NavLink
             to="/shop"
@@ -91,9 +199,11 @@ export default function Navbar() {
               }`
             }
           >
+
             {({ isActive }) => (
               <>
                 Shop
+
                 <span
                   className={`absolute bottom-0 left-4 right-4 h-[1.5px] bg-black transition-transform duration-300 origin-center ${
                     isActive
@@ -101,9 +211,14 @@ export default function Navbar() {
                       : 'scale-x-0 group-hover:scale-x-100'
                   }`}
                 />
+
               </>
             )}
+
           </NavLink>
+
+
+          {/* Wishlist */}
 
           <NavLink
             to="/wishlist"
@@ -115,9 +230,11 @@ export default function Navbar() {
               }`
             }
           >
+
             {({ isActive }) => (
               <>
                 Wishlist
+
                 <span
                   className={`absolute bottom-0 left-4 right-4 h-[1.5px] bg-black transition-transform duration-300 origin-center ${
                     isActive
@@ -125,9 +242,14 @@ export default function Navbar() {
                       : 'scale-x-0 group-hover:scale-x-100'
                   }`}
                 />
+
               </>
             )}
+
           </NavLink>
+
+
+          {/* Orders */}
 
           <NavLink
             to="/orders"
@@ -139,9 +261,11 @@ export default function Navbar() {
               }`
             }
           >
+
             {({ isActive }) => (
               <>
                 Orders
+
                 <span
                   className={`absolute bottom-0 left-4 right-4 h-[1.5px] bg-black transition-transform duration-300 origin-center ${
                     isActive
@@ -149,11 +273,17 @@ export default function Navbar() {
                       : 'scale-x-0 group-hover:scale-x-100'
                   }`}
                 />
+
               </>
             )}
+
           </NavLink>
 
+
+          {/* Admin */}
+
           {isAdmin && (
+
             <NavLink
               to="/admin"
               className={({ isActive }) =>
@@ -166,10 +296,23 @@ export default function Navbar() {
             >
               Admin
             </NavLink>
+
           )}
+
         </nav>
 
+
+        {/* ======================================
+            RIGHT SIDE
+        ====================================== */}
+
         <div className="flex items-center gap-2 sm:gap-4">
+
+
+          {/* ====================================
+              CART
+          ==================================== */}
+
           <NavLink
             to="/cart"
             className={({ isActive }) =>
@@ -180,14 +323,26 @@ export default function Navbar() {
               }`
             }
           >
+
             <ShoppingBag className="h-[19px] w-[19px]" />
 
-            {totalItems > 0 && (
+
+            {isLoggedIn && totalItems > 0 && (
+
               <span className="absolute top-0.5 right-0.5 bg-black text-white text-[9px] font-semibold rounded-full min-w-[17px] h-[17px] px-1 flex items-center justify-center ring-2 ring-white">
+
                 {totalItems}
+
               </span>
+
             )}
+
           </NavLink>
+
+
+          {/* ====================================
+              WISHLIST ICON
+          ==================================== */}
 
           <NavLink
             to="/wishlist"
@@ -199,48 +354,89 @@ export default function Navbar() {
               }`
             }
           >
+
             <Heart className="h-[19px] w-[19px]" />
+
           </NavLink>
 
+
+          {/* ====================================
+              LOGIN / LOGOUT
+          ==================================== */}
+
           {!isLoggedIn ? (
+
             <Link
               to="/login"
               className="hidden md:flex items-center gap-2 bg-black text-white text-xs font-semibold px-5 py-2.5 rounded-full hover:bg-gray-800 hover:shadow-lg transition-all duration-300"
             >
+
               <User className="h-4 w-4" />
+
               Login
+
             </Link>
+
           ) : (
+
             <button
               onClick={handleLogout}
               className="hidden md:flex items-center gap-2 border border-gray-200 bg-white text-gray-700 text-xs font-semibold px-5 py-2.5 rounded-full hover:bg-gray-100 hover:border-gray-300 transition-all duration-300"
             >
+
               <User className="h-4 w-4" />
+
               Logout
+
             </button>
+
           )}
+
+
+          {/* ====================================
+              MOBILE MENU BUTTON
+          ==================================== */}
 
           <button
             className="md:hidden flex items-center justify-center w-10 h-10 rounded-full text-gray-700 hover:bg-gray-100 transition-all duration-300"
-            onClick={() => setMenuOpen(!menuOpen)}
+            onClick={() =>
+              setMenuOpen(!menuOpen)
+            }
             aria-label="Toggle menu"
           >
+
             {menuOpen ? (
               <X className="h-5 w-5" />
             ) : (
               <Menu className="h-5 w-5" />
             )}
+
           </button>
+
         </div>
+
       </div>
 
+
+      {/* ========================================
+          MOBILE MENU
+      ======================================== */}
+
       {menuOpen && (
+
         <div className="md:hidden bg-white border-t border-gray-100 px-5 py-5 shadow-xl">
+
           <div className="flex flex-col gap-1">
+
+
+            {/* Home */}
+
             <NavLink
               to="/"
               end
-              onClick={() => setMenuOpen(false)}
+              onClick={() =>
+                setMenuOpen(false)
+              }
               className={({ isActive }) =>
                 `flex items-center py-3.5 px-4 text-sm font-medium rounded-xl transition-all ${
                   isActive
@@ -252,9 +448,14 @@ export default function Navbar() {
               Home
             </NavLink>
 
+
+            {/* Shop */}
+
             <NavLink
               to="/shop"
-              onClick={() => setMenuOpen(false)}
+              onClick={() =>
+                setMenuOpen(false)
+              }
               className={({ isActive }) =>
                 `flex items-center py-3.5 px-4 text-sm font-medium rounded-xl transition-all ${
                   isActive
@@ -266,9 +467,14 @@ export default function Navbar() {
               Shop
             </NavLink>
 
+
+            {/* Wishlist */}
+
             <NavLink
               to="/wishlist"
-              onClick={() => setMenuOpen(false)}
+              onClick={() =>
+                setMenuOpen(false)
+              }
               className={({ isActive }) =>
                 `flex items-center justify-between py-3.5 px-4 text-sm font-medium rounded-xl transition-all ${
                   isActive
@@ -277,13 +483,21 @@ export default function Navbar() {
                 }`
               }
             >
+
               Wishlist
+
               <Heart className="h-4 w-4" />
+
             </NavLink>
+
+
+            {/* Orders */}
 
             <NavLink
               to="/orders"
-              onClick={() => setMenuOpen(false)}
+              onClick={() =>
+                setMenuOpen(false)
+              }
               className={({ isActive }) =>
                 `flex items-center py-3.5 px-4 text-sm font-medium rounded-xl transition-all ${
                   isActive
@@ -295,10 +509,16 @@ export default function Navbar() {
               Orders
             </NavLink>
 
+
+            {/* Admin */}
+
             {isAdmin && (
+
               <NavLink
                 to="/admin"
-                onClick={() => setMenuOpen(false)}
+                onClick={() =>
+                  setMenuOpen(false)
+                }
                 className={({ isActive }) =>
                   `flex items-center py-3.5 px-4 text-sm font-semibold rounded-xl transition-all ${
                     isActive
@@ -309,29 +529,52 @@ export default function Navbar() {
               >
                 Admin Dashboard
               </NavLink>
+
             )}
+
           </div>
 
+
+          {/* ======================================
+              MOBILE LOGIN / LOGOUT
+          ====================================== */}
+
           {!isLoggedIn ? (
+
             <Link
               to="/login"
-              onClick={() => setMenuOpen(false)}
+              onClick={() =>
+                setMenuOpen(false)
+              }
               className="flex items-center justify-center gap-2 bg-black text-white text-sm font-semibold px-4 py-3.5 rounded-full mt-4 hover:bg-gray-800 transition-all"
             >
+
               <User className="h-4 w-4" />
+
               Login
+
             </Link>
+
           ) : (
+
             <button
               onClick={handleLogout}
               className="w-full flex items-center justify-center gap-2 border border-gray-200 text-gray-700 text-sm font-semibold px-4 py-3.5 rounded-full mt-4 hover:bg-gray-100 transition-all"
             >
+
               <User className="h-4 w-4" />
+
               Logout
+
             </button>
+
           )}
+
         </div>
+
       )}
+
     </header>
   )
 }
+

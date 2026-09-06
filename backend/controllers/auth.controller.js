@@ -1,3 +1,4 @@
+
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import crypto from 'crypto'
@@ -29,9 +30,15 @@ const sendToken = (user, statusCode, res) => {
   })
 }
 
+// ─────────────────────────────────────────────
+// Send Password Reset Email
+// ─────────────────────────────────────────────
+
 const sendResetEmail = async (user, resetUrl) => {
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASSWORD,
@@ -42,46 +49,136 @@ const sendResetEmail = async (user, resetUrl) => {
     from: `"ChronoSphere" <${process.env.EMAIL_USER}>`,
     to: user.email,
     subject: 'ChronoSphere - Password Reset',
+
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 40px 20px; background: #f9fafb;">
-        <div style="background: white; padding: 35px; border-radius: 20px; border: 1px solid #eeeeee;">
+      <div
+        style="
+          font-family: Arial, sans-serif;
+          max-width: 600px;
+          margin: auto;
+          padding: 40px 20px;
+          background: #f9fafb;
+        "
+      >
+
+        <div
+          style="
+            background: white;
+            padding: 35px;
+            border-radius: 20px;
+            border: 1px solid #eeeeee;
+          "
+        >
+
           <div style="text-align: center;">
-            <div style="display: inline-block; background: #000; color: #fff; width: 50px; height: 50px; line-height: 50px; border-radius: 50%; font-size: 22px;">
+
+            <!-- Logo -->
+
+            <div
+              style="
+                display: inline-block;
+                background: #000;
+                color: #fff;
+                width: 50px;
+                height: 50px;
+                line-height: 50px;
+                border-radius: 50%;
+                font-size: 22px;
+              "
+            >
               C
             </div>
 
-            <h1 style="font-family: Georgia, serif; color: #111; margin-top: 20px;">
+            <!-- Heading -->
+
+            <h1
+              style="
+                font-family: Georgia, serif;
+                color: #111;
+                margin-top: 20px;
+              "
+            >
               Reset Your Password
             </h1>
 
-            <p style="color: #666; line-height: 1.6;">
+            <!-- Greeting -->
+
+            <p
+              style="
+                color: #666;
+                line-height: 1.6;
+              "
+            >
               Hello ${user.name},
             </p>
 
-            <p style="color: #666; line-height: 1.6;">
-              We received a request to reset your ChronoSphere account password.
+            <!-- Message -->
+
+            <p
+              style="
+                color: #666;
+                line-height: 1.6;
+              "
+            >
+              We received a request to reset your ChronoSphere
+              account password.
             </p>
+
+            <!-- Reset Button -->
 
             <a
               href="${resetUrl}"
-              style="display: inline-block; margin: 20px 0; padding: 14px 28px; background: #000; color: #fff; text-decoration: none; border-radius: 30px; font-weight: bold;"
+              style="
+                display: inline-block;
+                margin: 20px 0;
+                padding: 14px 28px;
+                background: #000;
+                color: #fff;
+                text-decoration: none;
+                border-radius: 30px;
+                font-weight: bold;
+              "
             >
               Reset Password
             </a>
 
-            <p style="color: #999; font-size: 13px; line-height: 1.6;">
+            <!-- Expiry -->
+
+            <p
+              style="
+                color: #999;
+                font-size: 13px;
+                line-height: 1.6;
+              "
+            >
               This link will expire in 15 minutes.
             </p>
 
-            <p style="color: #999; font-size: 13px; line-height: 1.6;">
-              If you did not request a password reset, you can safely ignore this email.
+            <!-- Security message -->
+
+            <p
+              style="
+                color: #999;
+                font-size: 13px;
+                line-height: 1.6;
+              "
+            >
+              If you did not request a password reset,
+              you can safely ignore this email.
             </p>
+
           </div>
+
         </div>
+
       </div>
     `,
   })
 }
+
+// ─────────────────────────────────────────────
+// Register
+// ─────────────────────────────────────────────
 
 export const register = async (req, res) => {
   try {
@@ -117,6 +214,10 @@ export const register = async (req, res) => {
   }
 }
 
+// ─────────────────────────────────────────────
+// Login
+// ─────────────────────────────────────────────
+
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body
@@ -127,7 +228,9 @@ export const login = async (req, res) => {
       })
     }
 
-    const user = await User.findOne({ email }).select('+password')
+    const user = await User.findOne({
+      email,
+    }).select('+password')
 
     if (!user) {
       return res.status(401).json({
@@ -154,6 +257,10 @@ export const login = async (req, res) => {
   }
 }
 
+// ─────────────────────────────────────────────
+// Logout
+// ─────────────────────────────────────────────
+
 export const logout = async (req, res) => {
   try {
     res.status(200).json({
@@ -167,6 +274,10 @@ export const logout = async (req, res) => {
   }
 }
 
+// ─────────────────────────────────────────────
+// Get Current User
+// ─────────────────────────────────────────────
+
 export const getme = async (req, res) => {
   try {
     res.status(200).json({
@@ -179,6 +290,10 @@ export const getme = async (req, res) => {
     })
   }
 }
+
+// ─────────────────────────────────────────────
+// Forgot Password
+// ─────────────────────────────────────────────
 
 export const forgotPassword = async (req, res) => {
   try {
@@ -194,6 +309,8 @@ export const forgotPassword = async (req, res) => {
       email: email.toLowerCase().trim(),
     })
 
+    // Do not reveal whether an email exists
+
     if (!user) {
       return res.status(200).json({
         success: true,
@@ -202,9 +319,13 @@ export const forgotPassword = async (req, res) => {
       })
     }
 
+    // Generate reset token
+
     const resetToken = crypto
       .randomBytes(32)
       .toString('hex')
+
+    // Hash token before saving to database
 
     const hashedToken = crypto
       .createHash('sha256')
@@ -212,6 +333,7 @@ export const forgotPassword = async (req, res) => {
       .digest('hex')
 
     user.resetPasswordToken = hashedToken
+
     user.resetPasswordExpire =
       Date.now() + 15 * 60 * 1000
 
@@ -219,19 +341,25 @@ export const forgotPassword = async (req, res) => {
       validateBeforeSave: false,
     })
 
+    // Production frontend URL
+
     const clientUrl =
       process.env.CLIENT_URL || 'http://localhost:5173'
 
-    const resetUrl = `${clientUrl}/reset-password/${resetToken}`
+    const resetUrl =
+      `${clientUrl}/reset-password/${resetToken}`
 
     try {
       await sendResetEmail(user, resetUrl)
 
       return res.status(200).json({
         success: true,
-        message: 'Password reset link sent to your email',
+        message:
+          'Password reset link sent to your email',
       })
     } catch (emailError) {
+      // Remove reset token if email fails
+
       user.resetPasswordToken = null
       user.resetPasswordExpire = null
 
@@ -245,7 +373,8 @@ export const forgotPassword = async (req, res) => {
       )
 
       return res.status(500).json({
-        message: 'Unable to send password reset email',
+        message:
+          'Unable to send password reset email',
       })
     }
   } catch (error) {
@@ -254,6 +383,10 @@ export const forgotPassword = async (req, res) => {
     })
   }
 }
+
+// ─────────────────────────────────────────────
+// Reset Password
+// ─────────────────────────────────────────────
 
 export const resetPassword = async (req, res) => {
   try {
@@ -268,17 +401,23 @@ export const resetPassword = async (req, res) => {
 
     if (password.length < 6) {
       return res.status(400).json({
-        message: 'Password must be at least 6 characters',
+        message:
+          'Password must be at least 6 characters',
       })
     }
+
+    // Hash received reset token
 
     const hashedToken = crypto
       .createHash('sha256')
       .update(token)
       .digest('hex')
 
+    // Find valid user
+
     const user = await User.findOne({
       resetPasswordToken: hashedToken,
+
       resetPasswordExpire: {
         $gt: Date.now(),
       },
@@ -286,11 +425,20 @@ export const resetPassword = async (req, res) => {
 
     if (!user) {
       return res.status(400).json({
-        message: 'Invalid or expired password reset token',
+        message:
+          'Invalid or expired password reset token',
       })
     }
 
-    user.password = await bcrypt.hash(password, 10)
+    // Update password
+
+    user.password = await bcrypt.hash(
+      password,
+      10
+    )
+
+    // Remove reset token
+
     user.resetPasswordToken = null
     user.resetPasswordExpire = null
 
@@ -307,3 +455,4 @@ export const resetPassword = async (req, res) => {
     })
   }
 }
+

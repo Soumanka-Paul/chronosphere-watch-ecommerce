@@ -2,8 +2,10 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import crypto from 'crypto'
-import nodemailer from 'nodemailer'
+import { Resend } from 'resend'
 import User from '../models/user.model.js'
+
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 const generateToken = (id) => {
   return jwt.sign(
@@ -35,19 +37,9 @@ const sendToken = (user, statusCode, res) => {
 // ─────────────────────────────────────────────
 
 const sendResetEmail = async (user, resetUrl) => {
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD,
-    },
-  })
-
-  await transporter.sendMail({
-    from: `"ChronoSphere" <${process.env.EMAIL_USER}>`,
-    to: user.email,
+  const { data, error } = await resend.emails.send({
+    from: 'ChronoSphere <onboarding@resend.dev>',
+    to: [user.email],
     subject: 'ChronoSphere - Password Reset',
 
     html: `
@@ -120,8 +112,8 @@ const sendResetEmail = async (user, resetUrl) => {
                 line-height: 1.6;
               "
             >
-              We received a request to reset your ChronoSphere
-              account password.
+              We received a request to reset your
+              ChronoSphere account password.
             </p>
 
             <!-- Reset Button -->
@@ -174,6 +166,12 @@ const sendResetEmail = async (user, resetUrl) => {
       </div>
     `,
   })
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return data
 }
 
 // ─────────────────────────────────────────────
@@ -309,7 +307,7 @@ export const forgotPassword = async (req, res) => {
       email: email.toLowerCase().trim(),
     })
 
-    // Do not reveal whether an email exists
+    // Don't reveal whether an email exists
 
     if (!user) {
       return res.status(200).json({
@@ -325,7 +323,7 @@ export const forgotPassword = async (req, res) => {
       .randomBytes(32)
       .toString('hex')
 
-    // Hash token before saving to database
+    // Hash token before storing in database
 
     const hashedToken = crypto
       .createHash('sha256')
@@ -358,7 +356,7 @@ export const forgotPassword = async (req, res) => {
           'Password reset link sent to your email',
       })
     } catch (emailError) {
-      // Remove reset token if email fails
+      // Remove token if email fails
 
       user.resetPasswordToken = null
       user.resetPasswordExpire = null
@@ -406,14 +404,14 @@ export const resetPassword = async (req, res) => {
       })
     }
 
-    // Hash received reset token
+    // Hash received token
 
     const hashedToken = crypto
       .createHash('sha256')
       .update(token)
       .digest('hex')
 
-    // Find valid user
+    // Find valid reset token
 
     const user = await User.findOne({
       resetPasswordToken: hashedToken,
@@ -437,7 +435,7 @@ export const resetPassword = async (req, res) => {
       10
     )
 
-    // Remove reset token
+    // Clear reset token
 
     user.resetPasswordToken = null
     user.resetPasswordExpire = null

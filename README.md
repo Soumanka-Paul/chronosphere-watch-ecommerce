@@ -6,7 +6,7 @@ The project is designed with a modern, minimal, and premium UI inspired by luxur
 
 ---
 
-## ✨ Features
+## ✨ Features 
 
 ### 👤 User Authentication
 

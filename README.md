@@ -95,9 +95,7 @@ Admin features include:
 
 Product images are uploaded and managed using **Cloudinary**, allowing the application to efficiently handle watch images without storing large image files directly in MongoDB.
 
-### 📧 Email Integration
 
-**Nodemailer** is used for sending password-reset emails during the forgot-password workflow.
 
 ### 📱 Responsive UI
 
@@ -130,7 +128,6 @@ Product images are uploaded and managed using **Cloudinary**, allowing the appli
 * **Mongoose**
 * **JWT**
 * **bcryptjs**
-* **Nodemailer**
 * **Cloudinary**
 * **Razorpay**
 
@@ -172,8 +169,8 @@ Chronosphere follows a **MERN-based client-server architecture**.
                                │
                                ▼
                          ┌──────────┐
-                         │Nodemailer│
-                         │  Email   │
+                         │SMTP SERVER│
+                         │     │
                          └──────────┘
 ```
 
@@ -370,36 +367,7 @@ Successful Payment
 
 ---
 
-# 📧 Forgot Password Flow
 
-The application provides a complete password recovery system.
-
-```text
-User
- │
- ▼
-Forgot Password
- │
- ▼
-Enter Email
- │
- ▼
-Backend Generates Reset Token
- │
- ▼
-Nodemailer Sends Email
- │
- ▼
-User Opens Reset Link
- │
- ▼
-Reset Password
- │
- ▼
-Password Updated
-```
-
----
 
 # ☁️ Image Upload Flow
 

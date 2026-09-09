@@ -1,14 +1,22 @@
 # ⌚ Chronosphere — Luxury Watch E-Commerce Platform
 
-**Chronosphere** is a full-stack luxury watch e-commerce platform built using the **MERN stack**. It provides a complete online shopping experience with secure authentication, product browsing, cart and wishlist management, online payments, order tracking, reviews and ratings, and a dedicated admin dashboard.
+**Chronosphere** is a full-stack luxury watch e-commerce platform built using the **MERN stack**. It provides a complete online shopping experience with secure authentication, product browsing, cart and wishlist management, online payments, order management, reviews and ratings, and a dedicated admin dashboard.
 
-The project is designed with a modern, minimal, and premium UI inspired by luxury watch brands.
+The project features a modern, minimal, and premium UI inspired by luxury watch brands.
 
 ---
 
-## ✨ Features 
+## 🌐 Live Demo
 
-### 👤 User Authentication
+🔗 **Live Website:** https://chronosphere-watch-ecommerce.vercel.app/
+
+🔗 **GitHub Repository:** https://github.com/Soumanka-Paul/chronosphere-watch-ecommerce.git
+
+---
+
+# ✨ Features
+
+## 👤 User Authentication
 
 * User registration and login
 * JWT-based authentication
@@ -16,11 +24,9 @@ The project is designed with a modern, minimal, and premium UI inspired by luxur
 * Protected routes
 * Authentication-aware navigation
 * Secure logout
-* Forgot password functionality
-* Password reset using email
 * Role-based admin access
 
-### ⌚ Watch Catalog
+## ⌚ Watch Catalog
 
 * Browse luxury watches
 * Search and explore products
@@ -31,7 +37,7 @@ The project is designed with a modern, minimal, and premium UI inspired by luxur
 * Discount pricing
 * Product ratings and reviews
 
-### 🛒 Shopping Cart
+## 🛒 Shopping Cart
 
 * Add watches to cart
 * Remove items from cart
@@ -39,9 +45,10 @@ The project is designed with a modern, minimal, and premium UI inspired by luxur
 * Stock-aware quantity management
 * Automatic price calculation
 * Cart item count in navbar
+* User-specific persistent cart
 * Login required for adding products to cart
 
-### ❤️ Wishlist
+## ❤️ Wishlist
 
 * Add watches to wishlist
 * Remove watches from wishlist
@@ -49,7 +56,7 @@ The project is designed with a modern, minimal, and premium UI inspired by luxur
 * Wishlist button on product cards
 * Authentication-protected wishlist functionality
 
-### 💳 Online Payment
+## 💳 Online Payment
 
 * Razorpay payment integration
 * Secure payment order creation
@@ -57,16 +64,16 @@ The project is designed with a modern, minimal, and premium UI inspired by luxur
 * Order creation after successful payment
 * Automatic stock reduction after successful payment
 
-### 📦 Orders
+## 📦 Orders
 
 * Place orders after successful payment
 * View previous orders
-* Order details
+* View order details
 * Order status management
 * Admin order management
 * Stock synchronization after purchase
 
-### ⭐ Reviews & Ratings
+## ⭐ Reviews & Ratings
 
 * Submit product reviews
 * Star-based ratings
@@ -75,7 +82,7 @@ The project is designed with a modern, minimal, and premium UI inspired by luxur
 * Review cards
 * Rating component
 
-### 👨‍💼 Admin Dashboard
+## 👨‍💼 Admin Dashboard
 
 Administrators have access to a dedicated dashboard for managing the e-commerce platform.
 
@@ -91,13 +98,11 @@ Admin features include:
 * Manage users
 * Role-based admin authorization
 
-### ☁️ Cloudinary Integration
+## ☁️ Cloudinary Integration
 
 Product images are uploaded and managed using **Cloudinary**, allowing the application to efficiently handle watch images without storing large image files directly in MongoDB.
 
-
-
-### 📱 Responsive UI
+## 📱 Responsive UI
 
 * Responsive design for desktop, tablet, and mobile
 * Modern luxury-inspired interface
@@ -166,12 +171,6 @@ Chronosphere follows a **MERN-based client-server architecture**.
           │ MongoDB  │   │Cloudinary│   │ Razorpay │
           │ Database │   │  Images  │   │ Payments │
           └──────────┘   └──────────┘   └──────────┘
-                               │
-                               ▼
-                         ┌──────────┐
-                         │SMTP SERVER│
-                         │     │
-                         └──────────┘
 ```
 
 ---
@@ -224,7 +223,6 @@ Chronosphere/
 │   ├── package.json
 │   └── package-lock.json
 │
-│
 ├── frontend/
 │   │
 │   ├── public/
@@ -251,11 +249,6 @@ Chronosphere/
 │   │   │   ├── AuthContext.jsx
 │   │   │   └── CartContext.jsx
 │   │   │
-│   │   ├── hooks/
-│   │   │   ├── useAuth.js
-│   │   │   ├── useCart.js
-│   │   │   └── useWishlist.js
-│   │   │
 │   │   ├── pages/
 │   │   │   ├── Cart.jsx
 │   │   │   ├── Checkout.jsx
@@ -269,27 +262,22 @@ Chronosphere/
 │   │   │   ├── WatchDetail.jsx
 │   │   │   └── Wishlist.jsx
 │   │   │
-│   │   │   └── admin/
-│   │   │       ├── AdminLayout.jsx
-│   │   │       ├── AdminRoute.jsx
-│   │   │       ├── Dashboard.jsx
-│   │   │       ├── ManageOrders.jsx
-│   │   │       ├── ManageUsers.jsx
-│   │   │       └── ManageWatches.jsx
-│   │   │
-│   │   ├── utils/
-│   │   │   ├── axios.js
-│   │   │   ├── constants.js
-│   │   │   └── formatPrice.js
-│   │   │
-│   │   ├── App.jsx
-│   │   ├── index.css
-│   │   └── main.jsx
+│   │   └── admin/
+│   │       ├── AdminLayout.jsx
+│   │       ├── AdminRoute.jsx
+│   │       ├── Dashboard.jsx
+│   │       ├── ManageOrders.jsx
+│   │       ├── ManageUsers.jsx
+│   │       └── ManageWatches.jsx
 │   │
-│   ├── index.html
-│   ├── package.json
-│   ├── vite.config.js
-│   └── eslint.config.js
+│   ├── utils/
+│   │   ├── axios.js
+│   │   ├── constants.js
+│   │   └── formatPrice.js
+│   │
+│   ├── App.jsx
+│   ├── index.css
+│   └── main.jsx
 │
 ├── .gitignore
 └── README.md
@@ -367,8 +355,6 @@ Successful Payment
 
 ---
 
-
-
 # ☁️ Image Upload Flow
 
 Product images are handled through Cloudinary.
@@ -442,12 +428,9 @@ CLOUDINARY_API_SECRET=your_cloudinary_api_secret
 
 RAZORPAY_KEY_ID=your_razorpay_key_id
 RAZORPAY_KEY_SECRET=your_razorpay_key_secret
-
-EMAIL_USER=your_email
-EMAIL_PASS=your_email_password
 ```
 
-> **Important:** Never commit your `.env` file or real API keys, database credentials, email passwords, JWT secrets, or payment secrets to GitHub.
+> **Important:** Never commit your `.env` file or real API keys, database credentials, JWT secrets, or payment secrets to GitHub.
 
 Start the backend:
 
@@ -483,7 +466,7 @@ Start the development server:
 npm run dev
 ```
 
-The frontend will run on the Vite development server, typically:
+The frontend will run on:
 
 ```text
 http://localhost:5173
@@ -495,28 +478,24 @@ http://localhost:5173
 
 The following environment variables are required by the backend:
 
-| Variable                | Purpose                              |
-| ----------------------- | ------------------------------------ |
-| `PORT`                  | Backend server port                  |
-| `MONGO_URI`             | MongoDB connection string            |
-| `JWT_SECRET`            | JWT signing secret                   |
-| `JWT_EXPIRE`            | JWT expiration time                  |
-| `CLIENT_URL`            | Frontend URL                         |
-| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name                |
-| `CLOUDINARY_API_KEY`    | Cloudinary API key                   |
-| `CLOUDINARY_API_SECRET` | Cloudinary API secret                |
-| `RAZORPAY_KEY_ID`       | Razorpay public key                  |
-| `RAZORPAY_KEY_SECRET`   | Razorpay secret                      |
-| `EMAIL_USER`            | Email account used by Nodemailer     |
-| `EMAIL_PASS`            | Email app password / SMTP credential |
+| Variable                | Purpose                   |
+| ----------------------- | ------------------------- |
+| `PORT`                  | Backend server port       |
+| `MONGO_URI`             | MongoDB connection string |
+| `JWT_SECRET`            | JWT signing secret        |
+| `JWT_EXPIRE`            | JWT expiration time       |
+| `CLIENT_URL`            | Frontend URL              |
+| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name     |
+| `CLOUDINARY_API_KEY`    | Cloudinary API key        |
+| `CLOUDINARY_API_SECRET` | Cloudinary API secret     |
+| `RAZORPAY_KEY_ID`       | Razorpay public key       |
+| `RAZORPAY_KEY_SECRET`   | Razorpay secret           |
 
 ---
 
 # 🧪 Testing the Application
 
-After starting both servers:
-
-### Customer Flow
+## Customer Flow
 
 ```text
 Register
@@ -542,7 +521,7 @@ View Orders
 Review Purchased Product
 ```
 
-### Admin Flow
+## Admin Flow
 
 ```text
 Admin Login
@@ -570,26 +549,6 @@ Chronosphere implements several security-related practices:
 
 ---
 
-# 📌 Future Improvements
-
-Some features that can be added in future versions:
-
-* Advanced product filtering
-* Product sorting
-* Search suggestions
-* Coupon and discount system
-* Multiple payment methods
-* Address management
-* User profile management
-* Product comparison
-* Recently viewed products
-* Email notifications for order updates
-* Order cancellation and refund workflow
-* Sales analytics and charts
-* Deployment automation with CI/CD
-
----
-
 # 🎯 Learning Objectives
 
 This project was built to gain practical experience with:
@@ -601,10 +560,9 @@ This project was built to gain practical experience with:
 * Authentication and authorization
 * JWT-based security
 * MongoDB data modeling
-* Mongoose relationships
+* Mongoose
 * Payment gateway integration
 * Cloudinary image management
-* Email automation with Nodemailer
 * Admin dashboard development
 * Git and GitHub
 * Production-oriented project structure

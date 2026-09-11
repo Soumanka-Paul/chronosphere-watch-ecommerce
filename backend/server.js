@@ -1,7 +1,11 @@
+
+import 'dotenv/config'
+
 import express from 'express'
-import dotenv from 'dotenv'
 import cors from 'cors'
+
 import connectDB from './config/db.js'
+
 import authRoutes from './routes/auth.routes.js'
 import watchRoutes from './routes/watch.routes.js'
 import cartRoutes from './routes/cart.routes.js'
@@ -11,9 +15,8 @@ import reviewRoutes from './routes/review.routes.js'
 import paymentRoutes from './routes/payment.routes.js'
 import adminRoutes from './routes/admin.routes.js'
 
-dotenv.config()
-
 console.log('MONGODB_URI exists:', !!process.env.MONGODB_URI)
+console.log('RESEND_API_KEY exists:', !!process.env.RESEND_API_KEY)
 
 connectDB()
 
@@ -55,3 +58,4 @@ const PORT = process.env.PORT || 5000
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`)
 })
+
